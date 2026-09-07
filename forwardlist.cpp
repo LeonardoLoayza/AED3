@@ -59,6 +59,16 @@ public:
         nelem--;
     }
 
+    int& operator[](int j){
+        // assert j <= nelem
+        CNode*p=head;
+        for(int i=0;i<j;i++){
+            p=p->next;
+        }
+        return p->v;
+    }
+
+
 };
 
 int main(){
