@@ -79,6 +79,25 @@ public:
 
     }
 
+    void eraseAllDuplicates(){
+        CNode*p=head;
+        CNode*b=p;
+        b = p->next;
+        while(p&&p->next){
+            while(b!=nullptr){
+                if(b->v==p->v){//delete b
+                    p->next=b->next;
+                    delete b;
+                    nelem--;
+                }
+                else{
+                    b=b->next;
+                }
+            }
+            p=p->next;
+        }
+    }
+
     void eraseAdyacentDuplicates(){
         CNode**p=&head;
         CNode*veci=nullptr;
@@ -110,7 +129,7 @@ int main(){
     lista.pushback(4);
     lista.pushback(1); // Este 1 se queda porque no es adyacente a los primeros
     cout << "Tamanio original: " << lista.nelem << endl;
-    lista.eraseAdyacentDuplicates();
+    lista.eraseAllDuplicates();
     cout << "Tamanio tras eraseDuplicates: " << lista.nelem << endl;
     // Imprimimos la lista
     cout << "Lista final: ";
