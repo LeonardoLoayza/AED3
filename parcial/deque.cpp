@@ -151,10 +151,9 @@ public:
 	}
 
 	int& operator[](int i){
-		return;
-	}
+		int iniciointerno=inival-*iniblq;
 		
-	
+	}
 		
 		
 };
