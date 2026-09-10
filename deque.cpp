@@ -128,10 +128,30 @@ public:
 	}
 
 	void expand(){
-		// int newmap = new int*[tammap*2];
+		int newtam=tammap*2;
+		int**nm=new int*[newtam];
+
+		for(int i=0;i<newtam;i++){
+			nm[i]=nullptr;
+		}
+
+		int offset = (newtam-tammap)/2;
 		
-		
-		
+		for(int i=0;i<tammap;i++){
+			nm[offset+i]=m[i];
+		}
+
+		iniblq=nm+(iniblq-m)+offset;
+		finblq=nm+(finblq-m)+offset;
+
+		delete[] m;
+		m=nm;
+		tammap=newtam;
+		return;
+	}
+
+	int& operator[](int i){
+		return;
 	}
 		
 	
