@@ -153,6 +153,7 @@ public:
 	int& operator[](int i){
 		int iniciointerno=inival-*iniblq;
 		
+		
 	}
 		
 		
