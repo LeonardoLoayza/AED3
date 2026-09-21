@@ -1,6 +1,6 @@
 #include <iostream>
 #include <assert.h>
-
+using namespace std;
 struct CDeque_iterator
 {
     int** chunk;
@@ -41,6 +41,36 @@ CDeque::CDeque(int cs, int ms)
     start.offset = finish.offset = *start.chunk + chunk_size / 2;
 
     nelem = 0;
+
+    // --- INICIO DE TRAMPA DE DOS BLOQUES ---
+
+    // 1. Llenamos los últimos 3 espacios del primer bloque
+    *finish.offset = 100;
+    finish.offset++;
+
+    *finish.offset = 200;
+    finish.offset++;
+
+    *finish.offset = 300;
+    finish.offset++;
+
+    // OJO AQUÍ: finish.offset ya llegó al límite del bloque actual.
+    // Si estuviéramos en push_back, aquí tendríamos que crear el nuevo bloque.
+    // Vamos a simularlo manualmente:
+
+    finish.chunk++;                           // Avanzamos al siguiente puntero en el map
+    *finish.chunk = new int[chunk_size];      // Reservamos memoria para el nuevo bloque
+    finish.offset = *finish.chunk;            // Ponemos el offset al inicio del nuevo bloque
+
+    // 2. Ahora escribimos en el nuevo bloque (el segundo chunk)
+    *finish.offset = 400;
+    finish.offset++;
+
+    *finish.offset = 500;
+    finish.offset++;
+
+    nelem = 5; // En total metimos 5 elementos
+    // --- FIN DE TRAMPA ---
 }
 
 CDeque::~CDeque()
@@ -72,23 +102,43 @@ void CDeque::pop_back()
 
 int& CDeque::operator[](int i)
 {
+    return i;
 }
 
 int& CDeque::front()
 {
+    return *start.offset;
 }
 
 int& CDeque::back()
 {
+    return *finish.offset; 
 }
 
 void CDeque::print()
 {
+    for (int** c = start.chunk;c <= finish.chunk;c++) {
+        int* a = *c; 
+
+        if (c == start.chunk) {
+            a = start.offset; 
+        }
+        
+        while (a < *c + chunk_size) {
+            if (a==finish.offset) {
+                break;
+            }
+            cout << *a << " ";
+            a++; 
+        }
+    }
 }
 
 int main()
 {
     CDeque v(5, 7);
+    v.print();
+
     v.push_back(3);
     v.push_back(7);
     v.push_back(6);
