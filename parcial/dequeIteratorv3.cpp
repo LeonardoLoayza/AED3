@@ -117,7 +117,13 @@ void CDeque::pop_back()
 
 int& CDeque::operator[](int i)
 {
-    return i;
+    int startchunk = start.chunk - map;
+    int startoffset = start.offset - *start.chunk;
+
+    int pos = chunk_size * map_size + startchunk + i;
+    int chunk = pos / chunk_size;
+    int offset = pos % chunk_size;
+    return map[chunk][offset];
 }
 
 int& CDeque::front()
