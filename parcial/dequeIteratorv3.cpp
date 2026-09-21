@@ -41,36 +41,6 @@ CDeque::CDeque(int cs, int ms)
     start.offset = finish.offset = *start.chunk + chunk_size / 2;
 
     nelem = 0;
-
-    // --- INICIO DE TRAMPA DE DOS BLOQUES ---
-
-    // 1. Llenamos los últimos 3 espacios del primer bloque
-    *finish.offset = 100;
-    finish.offset++;
-
-    *finish.offset = 200;
-    finish.offset++;
-
-    *finish.offset = 300;
-    finish.offset++;
-
-    // OJO AQUÍ: finish.offset ya llegó al límite del bloque actual.
-    // Si estuviéramos en push_back, aquí tendríamos que crear el nuevo bloque.
-    // Vamos a simularlo manualmente:
-
-    finish.chunk++;                           // Avanzamos al siguiente puntero en el map
-    *finish.chunk = new int[chunk_size];      // Reservamos memoria para el nuevo bloque
-    finish.offset = *finish.chunk;            // Ponemos el offset al inicio del nuevo bloque
-
-    // 2. Ahora escribimos en el nuevo bloque (el segundo chunk)
-    *finish.offset = 400;
-    finish.offset++;
-
-    *finish.offset = 500;
-    finish.offset++;
-
-    nelem = 5; // En total metimos 5 elementos
-    // --- FIN DE TRAMPA ---
 }
 
 CDeque::~CDeque()
@@ -82,18 +52,63 @@ CDeque::~CDeque()
 
 void CDeque::expand_map()
 {
+    int newtam = map_size * 2;
+    int** newmap = new int* [newtam];
+
+    int offset = (newtam - map_size)/2;
+
+    for (int i = 0;i < map_size;i++) {
+        newmap[i + offset] = map[i];
+    }
+    start.chunk = newmap + (start.chunk-map)+offset;
+    finish.chunk = newmap + (finish.chunk-map)+offset;
+
+    delete[] map;
+    map = newmap;
+    map_size = newtam;
 }
 
-void CDeque::push_front(int x)
+void CDeque::push_front(int x)// 0, normal, expand
 {
+    if (nelem == chunk_size * map_size) {
+        expand_map();
+    }
+    if (start.offset==*start.chunk) {
+        start.chunk--;
+        *start.chunk = new int[chunk_size];
+        start.offset = *start.chunk+chunk_size-1;
+        *start.offset = x;
+        nelem++;
+        return;
+    }
+    // normal
+    start.offset--;
+    *start.offset = x;
+    return;
 }
 
 void CDeque::pop_front()
 {
 }
 
-void CDeque::push_back(int x)
+void CDeque::push_back(int x) // 0, edge, normal, expand 
 {
+    if (nelem == chunk_size * map_size) {
+        expand_map();
+    }
+    if (finish.offset==*finish.chunk+chunk_size-1) {
+        *finish.offset = x;
+        finish.chunk++; 
+        *finish.chunk= new int[chunk_size];
+        finish.offset=*finish.chunk;
+        nelem++;
+        return;
+    }
+    
+    // normal
+    *finish.offset = x;
+    finish.offset++;
+    nelem++; 
 }
 
 void CDeque::pop_back()
@@ -145,27 +160,28 @@ int main()
     v.push_front(1);
     v.push_front(9);
     v.push_front(2);
+    v.push_front(4);
     v.print();
 
-    v[3] = 4;
-    v.print();
+    //v[3] = 4;
+    //v.print();
 
-    v.front() = 1;
-    v.back() = 1;
-    v.print();
+    //v.front() = 1;
+    //v.back() = 1;
+    //v.print();
 
 
-    v.pop_back();
-    v.pop_front();
-    v.print();
+    //v.pop_back();
+    //v.pop_front();
+    //v.print();
 
-    v.pop_back();
-    v.pop_front();
-    v.print();
+    //v.pop_back();
+    //v.pop_front();
+    //v.print();
 
-    v.pop_back();
-    v.pop_front();
-    v.print();
+    //v.pop_back();
+    //v.pop_front();
+    //v.print();
 
     std::cout << "\n";
 }
