@@ -87,8 +87,18 @@ void CDeque::push_front(int x)// 0, normal, expand
     return;
 }
 
-void CDeque::pop_front()
+void CDeque::pop_front()//0,normal,edge
 {
+    if (start.offset == finish.offset) return;
+    if (start.offset == *start.chunk + chunk_size - 1) {
+        delete[] *start.chunk;
+        start.chunk++;
+        start.offset = *start.chunk;
+        nelem--;
+        return;
+    }
+    start.offset++;
+    nelem--;
 }
 
 void CDeque::push_back(int x) // 0, edge, normal, expand 
@@ -111,8 +121,22 @@ void CDeque::push_back(int x) // 0, edge, normal, expand
     nelem++; 
 }
 
-void CDeque::pop_back()
+void CDeque::pop_back() // 0, normal, edge
 {
+    if (start.offset == finish.offset) {// 0 elem
+        return;
+    }
+
+    if (finish.offset == *finish.chunk) { // edge
+        delete[] * finish.chunk;
+        finish.chunk--;
+        finish.offset = *finish.chunk + chunk_size - 1;
+        nelem--;
+        return;
+    }
+
+    finish.offset--;
+    nelem--;
 }
 
 int& CDeque::operator[](int i)
