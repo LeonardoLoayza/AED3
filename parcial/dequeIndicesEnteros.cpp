@@ -127,7 +127,7 @@ void CDeque::expand() {
 }
 
 int& CDeque::operator[](int i) {
-	int pos=startchunk*chunksize+startoffset;
+	int pos=startchunk*chunksize+startoffset+i;
 	int chunk=pos/chunksize;
 	int offset=pos%chunksize;
 	return m[chunk][offset];
