@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 using namespace std; 
 
 class Node {
@@ -21,7 +22,28 @@ public:
 		root = nullptr;
 		lado_reemp = 0;
 	}
-	//~BinaryTree();
+	~BinaryTree() {
+		if (root == nullptr) return;
+		
+		Node* p = root;
+		queue<Node*>q;
+		q.push(p);
+		while (!q.empty()) {
+			Node* c = q.front();
+			q.pop(); 
+			if (c->left) {
+				q.push(c->left); 
+			}
+			if (c->right) {
+				q.push(c->right); 
+			}
+			cout<<"borrando nodo:"<<c->v<<endl;
+			delete c; 
+			c = nullptr; 
+		}
+		root = nullptr;
+		cout << "desutrctor god" << endl;
+	}
 	
 	bool insrt(int x) {
 		Node** p=nullptr;
@@ -124,47 +146,33 @@ public:
 	void clear(Node* p);
 	Node* get_root() { return root; }
 };
-
 int main() {
-	BinaryTree t;
+	cout << "--- TEST 1: Arbol con nodos ---" << endl;
+	{
+		BinaryTree t;
+		/*
+			   10
+			  /  \
+			 5    15
+			/ \
+		   2   7
+		*/
+		t.insrt(10);
+		t.insrt(5);
+		t.insrt(15);
+		t.insrt(2);
+		t.insrt(7);
 
-	/*
-			  50
-			/    \
-		  30      70
-		 /  \    /  \
-	   20   40  60   80
-	*/
-
-	t.insrt(50);
-	t.insrt(30);
-	t.insrt(70);
-	t.insrt(20);
-	t.insrt(40);
-	t.insrt(60);
-	t.insrt(80);
-
-	cout << "--- TEST 1: Inorder de un arbol completo ---" << endl;
-	cout << "Esperado: 20 30 40 50 60 70 80 " << endl;
-	cout << "Obtenido: ";
-	// Pasamos la raiz usando tu funcion get_root()
-	t.inorder(t.get_root());
-	cout << endl << endl;
+		cout << "Saliendo del bloque 1..." << endl;
+	} // Aqui se llama al destructor automaticamente
 
 
-	cout << "--- TEST 2: Inorder despues de eliminar una hoja (20) ---" << endl;
-	t.remv(20);
-	cout << "Esperado: 30 40 50 60 70 80 " << endl;
-	cout << "Obtenido: ";
-	t.inorder(t.get_root());
-	cout << endl << endl;
+	cout << "\n--- TEST 2: Arbol vacio ---" << endl;
+	{
+		BinaryTree t2;
+		// No insertamos nada
+		cout << "Saliendo del bloque 2..." << endl;
+	} // Aqui se llama al destructor automaticamente
 
-
-	cout << "--- TEST 3: Inorder despues de eliminar un nodo con 2 hijos (50 - la raiz) ---" << endl;
-	t.remv(50);
-	cout << "Esperado: 30 40 60 70 80 " << endl; // El arbol se reestructura pero sigue ordenado
-	cout << "Obtenido: ";
-	t.inorder(t.get_root());
-	cout << endl;
-
+	return 0;
 }
