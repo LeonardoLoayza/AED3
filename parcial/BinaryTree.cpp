@@ -105,7 +105,16 @@ public:
 	}
 
 	void print();
-	void inorder(Node* p);
+	void inorder(Node* n) {
+		if (n == nullptr) 
+			return; 
+		if (n->left)
+			inorder(n->left);
+		cout << n->v << " "; 
+		if (n->right)
+			inorder(n->right); 
+	}
+
 	void inorderST();
 	void Levels(Node* p);
 	void PrintLevels();
@@ -118,47 +127,44 @@ public:
 
 int main() {
 	BinaryTree t;
-	Node** p = nullptr;
 
-	cout << "--- TEST 1: Insercion (insrt) y Busqueda (find) ---" << endl;
-	cout << "Insertar 5: " << t.insrt(5) << " (Esperado: 1 - true)" << endl;
-	cout << "Insertar 3: " << t.insrt(3) << " (Esperado: 1 - true)" << endl;
-	cout << "Insertar 8: " << t.insrt(8) << " (Esperado: 1 - true)" << endl;
+	/*
+			  50
+			/    \
+		  30      70
+		 /  \    /  \
+	   20   40  60   80
+	*/
 
-	// Caso de prueba: Insertar un duplicado
-	cout << "Insertar 5 (duplicado): " << t.insrt(5) << " (Esperado: 0 - false)" << endl;
+	t.insrt(50);
+	t.insrt(30);
+	t.insrt(70);
+	t.insrt(20);
+	t.insrt(40);
+	t.insrt(60);
+	t.insrt(80);
 
-	// Caso de prueba: Buscar un elemento que existe y uno que no
-	cout << "Buscar 8: " << t.find(8, p) << " (Esperado: 1 - true)" << endl;
-	cout << "Buscar 10: " << t.find(10, p) << " (Esperado: 0 - false)" << endl;
+	cout << "--- TEST 1: Inorder de un arbol completo ---" << endl;
+	cout << "Esperado: 20 30 40 50 60 70 80 " << endl;
+	cout << "Obtenido: ";
+	// Pasamos la raiz usando tu funcion get_root()
+	t.inorder(t.get_root());
+	cout << endl << endl;
+
+
+	cout << "--- TEST 2: Inorder despues de eliminar una hoja (20) ---" << endl;
+	t.remv(20);
+	cout << "Esperado: 30 40 50 60 70 80 " << endl;
+	cout << "Obtenido: ";
+	t.inorder(t.get_root());
+	cout << endl << endl;
+
+
+	cout << "--- TEST 3: Inorder despues de eliminar un nodo con 2 hijos (50 - la raiz) ---" << endl;
+	t.remv(50);
+	cout << "Esperado: 30 40 60 70 80 " << endl; // El arbol se reestructura pero sigue ordenado
+	cout << "Obtenido: ";
+	t.inorder(t.get_root());
 	cout << endl;
 
-	cout << "--- TEST 2: Eliminacion (remv) - Caso 0 hijos (Nodos Hoja) ---" << endl;
-	t.insrt(10); // 8 -> derecho -> 10
-	// 10 no tiene hijos.
-	cout << "Remover 10 (0 hijos): " << t.remv(10) << " (Esperado: 1 - true)" << endl;
-	cout << "Buscar 10 despues de remover: " << t.find(10, p) << " (Esperado: 0 - false)" << endl;
-	cout << endl;
-
-	cout << "--- TEST 3: Eliminacion (remv) - Caso 1 hijo ---" << endl;
-	// Estructura actual: 5 (root), 3 (izq), 8 (der). 
-	t.insrt(9); // Hacemos que 8 tenga un hijo derecho (9)
-	cout << "Remover 8 (1 hijo, el 9): " << t.remv(8) << " (Esperado: 1 - true)" << endl;
-	// El 9 debió subir a la posicion del 8
-	cout << "Buscar 9 despues de remover 8: " << t.find(9, p) << " (Esperado: 1 - true)" << endl;
-	cout << endl;
-
-	cout << "--- TEST 4: Eliminacion (remv) - Caso 2 hijos ---" << endl;
-	// Estructura actual: root es 5. Hijos: 3 (izq), 9 (der).
-	t.insrt(2); // hijo izq de 3
-	t.insrt(4); // hijo der de 3
-	// Ahora 3 tiene dos hijos (2 y 4).
-	cout << "Remover 3 (2 hijos, el 2 y 4): " << t.remv(3) << " (Esperado: 1 - true)" << endl;
-	// Dependiendo de tu 'lado_reemp' (0 = izquierda), el reemplazo debería ser el mayor de los menores (2).
-	cout << endl;
-
-	cout << "--- TEST 5: Eliminacion de un nodo que no existe ---" << endl;
-	cout << "Remover 99: " << t.remv(99) << " (Esperado: 0 - false)" << endl;
-
-	return 0;
 }
