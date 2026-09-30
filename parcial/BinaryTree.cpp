@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <stack> 
 using namespace std; 
 
 class Node {
@@ -137,7 +138,21 @@ public:
 			inorder(n->right); 
 	}
 
-	void inorderST();
+	void inorderST() {
+		Node* c = root;
+		stack<Node*>s;
+		s.push(c);
+		while(c || !s.empty()) {
+			while (c) {
+				s.push(c->left);
+				c = c->left; 
+			}
+			c = s.top(); 
+			s.pop(); 
+			cout << c->v << " ";
+			c = c->right;
+		}	
+	}
 	void Levels(Node* p);
 	void PrintLevels();
 	int alturaMax();
