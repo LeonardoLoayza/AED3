@@ -157,7 +157,7 @@ public:
 	void PrintLevels();
 	int alturaMax();
 	void altr_maxI(Node* p, int cont, int& max);
-	int altr_maxR(Node* p);
+	int altr_maxR(Node* p);	
 	void clear(Node* p);
 	Node* get_root() { return root; }
 };
