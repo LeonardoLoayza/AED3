@@ -120,7 +120,7 @@ int main()
 
     std::cout << "\nRango [10, 25]: ";
     t.printRange(10, 25);
-    // Salida esperada: 15 20 25
+        // Salida esperada: 15 20 25
 
     std::cout << "\nRango [65, 100]: ";
     t.printRange(65, 100);
