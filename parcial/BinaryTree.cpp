@@ -83,7 +83,7 @@ public:
 			Node** q = fnd_reemp(p);
 			(*p)->v = (*q)->v;
 			p = q;
-
+			lado_reemp = !lado_reemp;
 		}
 		if (
 			((*p)->left && (*p)->right == nullptr) ||
