@@ -72,8 +72,48 @@ public:
 		root = 0;
 		cout << "Termina liberacion" << endl;
 	}
-
-	bool insrt(int x) { 
+    
+    AVLNode* rebalance(AVLNode* p){
+        p->height = updateHeight(p); 
+        int bf = getBalanceFactor(p);
+        
+        if (bf > 1){
+            if (bf < 0)
+                p->left = rotateLeft(p->left);
+            p = rotateRight(p); 
+        }
+        else if (bf < -1){
+            if (b >0)
+                p->right = rotateRight(p->right); 
+            p = rotateLeft(p); 
+        }
+        
+        return p; 
+    }
+    
+    
+	bool insrt(int x) { +
+	    stack<AVLNode**> s; 
+	    AVLNode**p=&root; 
+	    
+	    while (*p){
+	        s.push(p); 
+	        if((*p)->v == x) 
+	            return false;
+            if( (*p)->v < x ){
+                p=&((*p)->right);
+            }
+            else {
+                p=&((*p)->left);
+            }
+	    }
+	    if(*p) return false;
+	    
+	    while (s.empty == false){
+	        Node**a=s.top();
+	        s.pop();
+	        *a=rebalance(*a);
+	    }
 	}
 
 	bool remv(int x) {
@@ -114,7 +154,6 @@ public:
 
 	AVLNode* get_root() { return root; }
 };
-
 int main() {
 	AVLTree t;
 	cout << "Insertando: 60, 30, 70, 20, 40, 65, 80, 75" << endl;
