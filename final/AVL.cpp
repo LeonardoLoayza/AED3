@@ -22,42 +22,42 @@ class AVLTree {
 	bool lado_reemp;
 
 	int height(AVLNode* p) {
-		if (!p) return 0; 
+		if (!p) return 0;
 		return p->height;
 	}
 
 	void updateHeight(AVLNode* p) {
-		p->height = 1 + max(height(p->left), height(p->right); 
+		p->height = 1 + max(height(p->left), height(p->right));
 	}
 
 	int getBalanceFactor(AVLNode* p) {
-		if (!p) return 0; 
+		if (!p) return 0;
 		return height(p->left) - height(p->right);
 	}
 
 	AVLNode* rotateLeft(AVLNode* x) {
 		AVLNode* y = x->right;
-		AVLNode* yl = y->left; 
-		
-		x->right = yl; 
+		AVLNode* yl = y->left;
+
+		x->right = yl;
 		y->left = x;
 
-		updateHeight(x); 
-		updateHeight(y); 
-		return y; 
+		updateHeight(x);
+		updateHeight(y);
+		return y;
 
 	}
 
 	AVLNode* rotateRight(AVLNode* x) {
 		AVLNode* y = x->left;
-		AVLNode* yr = y->right; 
+		AVLNode* yr = y->right;
 
-		y->right = x; 
-		x->left = yr; 
+		y->right = x;
+		x->left = yr;
 
-		updateHeight(x); 
-		updateHeight(y); 
-		return y; 
+		updateHeight(x);
+		updateHeight(y);
+		return y;
 	}
 
 
@@ -72,48 +72,50 @@ public:
 		root = 0;
 		cout << "Termina liberacion" << endl;
 	}
-    
-    AVLNode* rebalance(AVLNode* p){
-        p->height = updateHeight(p); 
-        int bf = getBalanceFactor(p);
-        
-        if (bf > 1){
-            if (bf < 0)
-                p->left = rotateLeft(p->left);
-            p = rotateRight(p); 
-        }
-        else if (bf < -1){
-            if (b >0)
-                p->right = rotateRight(p->right); 
-            p = rotateLeft(p); 
-        }
-        
-        return p; 
-    }
-    
-    
-	bool insrt(int x) { +
-	    stack<AVLNode**> s; 
-	    AVLNode**p=&root; 
-	    
-	    while (*p){
-	        s.push(p); 
-	        if((*p)->v == x) 
-	            return false;
-            if( (*p)->v < x ){
-                p=&((*p)->right);
-            }
-            else {
-                p=&((*p)->left);
-            }
-	    }
-	    if(*p) return false;
-	    
-	    while (s.empty == false){
-	        Node**a=s.top();
-	        s.pop();
-	        *a=rebalance(*a);
-	    }
+
+	AVLNode* rebalance(AVLNode* p) {
+		updateHeight(p);
+		int bf = getBalanceFactor(p);
+
+		if (bf > 1) {
+			if (getBalanceFactor(p->left)< 0)
+				p->left = rotateLeft(p->left);
+			return rotateRight(p);
+		}
+		else if (bf < -1) {
+			if (getBalanceFactor(p->right) > 0)
+				p->right = rotateRight(p->right);
+			return rotateLeft(p);
+		}
+
+		return p;
+	}
+
+
+	bool insrt(int x) {
+		stack<AVLNode**> s;
+		AVLNode** p = &root;
+
+		while (*p) {
+			s.push(p);
+			if ((*p)->v == x)
+				return false;
+			if ((*p)->v < x) {
+				p = &((*p)->right);
+			}
+			else {
+				p = &((*p)->left);
+			}
+		}
+		*p = new AVLNode(x);
+
+		while (s.empty() == false) {
+			AVLNode** a = s.top();
+			s.pop();
+			*a = rebalance(*a);
+		}
+
+		return true;
 	}
 
 	bool remv(int x) {
@@ -123,27 +125,27 @@ public:
 	}
 
 	bool find(int x, AVLNode**& p) {
-		
+
 	}
 
 	void print() {
-		
+
 	}
 
 	void inorder(AVLNode* p) {
-		
+
 	}
 
 	void inorderST() {
-		
+
 	}
 
 	void Levels(AVLNode* p) {
-		
+
 	}
 
 	void PrintLevels() {
-		
+
 	}
 
 	int alturaMax() {
