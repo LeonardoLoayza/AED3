@@ -1,295 +1,241 @@
-/*
-ARBOL DE CARAMELOS - paso a paso
-
-Arbol de ejemplo (por niveles):
-		3
-	  0   0
-	-  -  2  0
-
-Controles:
-  ESPACIO : avanzar un paso (una ronda de recorrido)
-  A       : activar / desactivar modo automatico (1 paso por segundo)
-  R       : reiniciar el arbol
-
-Colores:
-  verde  = nodos que participaron en el ultimo paso
-  blanco = nodos sin cambio en el ultimo paso
-*/
-
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
-#include <SFML/Graphics.hpp>
 
-class node {
-public:
-	int value;
-	node* left;
-	node* right;
-	int x, y;
-	int marca;
+using namespace std;
 
-	node(int v) {
-		value = v;
-		left = nullptr;
-		right = nullptr;
-		x = 0;
-		y = 0;
-		marca = 0;
-	}
+// -------------------------------------------------------------
+// NODO
+// -------------------------------------------------------------
+struct Node {
+    int v;
+    Node* left;
+    Node* right;
+    float x, y;
+    int marca;
+
+    Node(int _v) {
+        v = _v;
+        left = right = nullptr;
+        x = y = 0.0f;
+        marca = 0;
+    }
 };
 
-class Ctree {
-private:
-	node* root;
-	int vueltas;      // numero de pasos realizados
-	bool terminado;   // true cuando ya no hay mas cambios
+// -------------------------------------------------------------
+// CLASE ARBOL DE CARAMELOS
+// -------------------------------------------------------------
+class CandyTree {
+    Node* root;
+    int vueltas;
+    bool terminado;
 
 public:
-	Ctree() {
-		root = nullptr;
-		vueltas = 0;
-		terminado = false;
-	}
+    CandyTree() {
+        root = nullptr;
+        vueltas = 0;
+        terminado = false;
+    }
 
-	~Ctree() {
-		clear(this->root);
-	}
+    ~CandyTree() {
+        clear(root);
+    }
 
-	void clear(node* n) {
-		if (!n)
-			return;
-		clear(n->left);
-		clear(n->right);
-		delete n;
-	}
+    Node* get_root() { return root; }
+    int get_vueltas() { return vueltas; }
+    bool get_terminado() { return terminado; }
 
-	node*& get_root() {
-		return root;
-	}
+    void clear(Node* p) {
+        if (!p) return;
+        clear(p->left);
+        clear(p->right);
+        delete p;
+    }
 
-	void setPosxy(node* n, int level, int& col) {
-		if (!n)
-			return;
-		setPosxy(n->left, level + 1, col);
-		n->x = col * 80 + 100;
-		n->y = level * 90 + 100;
-		col++;
-		setPosxy(n->right, level + 1, col);
-	}
+    void crear_arbol(int v) {
+        clear(root);
+        root = new Node(v);
+        vueltas = 0;
+        terminado = false;
+    }
 
-	void drawNode(sf::RenderWindow& pantalla, node* n, sf::Font& font) {
-		float radius = 16.0f;
+    void insertar_nodo(string rut, int k) {
+        Node** p = &root;
+        for (char c : rut) {
+            if (!*p) return;
+            if (c == 'L') p = &(*p)->left;
+            else if (c == 'R') p = &(*p)->right;
+        }
+        *p = new Node(k);
+    }
 
-		sf::CircleShape c(radius);
-		bool cambio = (!terminado && vueltas > 0 && n->marca == vueltas);
-		c.setFillColor(cambio ? sf::Color::Green : sf::Color::White);
-		c.setOrigin(radius, radius);
-		c.setPosition((float)n->x, (float)n->y);
-		pantalla.draw(c);
+    void calculatePositions(Node* p, float x, float y, float offset_x) {
+        if (!p) return;
+        p->x = x;
+        p->y = y;
+        calculatePositions(p->left, x - offset_x, y + 90.0f, offset_x / 2.0f);
+        calculatePositions(p->right, x + offset_x, y + 90.0f, offset_x / 2.0f);
+    }
 
-		sf::Text tex;
-		tex.setFont(font);
-		tex.setString(std::to_string(n->value));
-		tex.setCharacterSize(16);
-		tex.setFillColor(sf::Color::Black);
+    // Permite SOLO UN traspaso de caramelo por paso/iteración
+    bool recorrido(Node* p, int max_cambio) {
+        if (!p) return false;
 
-		sf::FloatRect b = tex.getLocalBounds();
-		tex.setOrigin(b.left + b.width / 2.0f,
-			b.top + b.height / 2.0f);
-		tex.setPosition((float)n->x, (float)n->y);
-		pantalla.draw(tex);
-	}
+        // Evaluar hijo izquierdo
+        if (p->left && p->marca != max_cambio && p->left->marca != max_cambio) {
+            Node* h = p->left;
+            if (h->v > 1 && h->v >= p->v) {
+                h->v--;
+                p->v++;
+                p->marca = h->marca = max_cambio;
+                return true;
+            }
+            else if (h->v == 0 && p->v >= 1) {
+                h->v++;
+                p->v--;
+                p->marca = h->marca = max_cambio;
+                return true;
+            }
+        }
 
-	void drawNodes(sf::RenderWindow& pantalla, node* n, sf::Font& font) {
-		if (!n)
-			return;
-		drawNodes(pantalla, n->left, font);
-		drawNode(pantalla, n, font);
-		drawNodes(pantalla, n->right, font);
-	}
+        // Evaluar hijo derecho
+        if (p->right && p->marca != max_cambio && p->right->marca != max_cambio) {
+            Node* h = p->right;
+            if (h->v > 1 && h->v >= p->v) {
+                h->v--;
+                p->v++;
+                p->marca = h->marca = max_cambio;
+                return true;
+            }
+            else if (h->v == 0 && p->v >= 1) {
+                h->v++;
+                p->v--;
+                p->marca = h->marca = max_cambio;
+                return true;
+            }
+        }
 
-	void drawLine(sf::RenderWindow& pantalla, node* node_a, node* node_b) {
-		sf::Vertex line[] = {
-			sf::Vertex(sf::Vector2f((float)node_a->x, (float)node_a->y), sf::Color::White),
-			sf::Vertex(sf::Vector2f((float)node_b->x, (float)node_b->y), sf::Color::White)
-		};
-		pantalla.draw(line, 2, sf::Lines);
-	}
+        if (recorrido(p->left, max_cambio)) return true;
+        if (recorrido(p->right, max_cambio)) return true;
 
-	void drawLines(sf::RenderWindow& pantalla, node* n) {
-		if (!n)
-			return;
-		if (n->left) {
-			drawLine(pantalla, n, n->left);
-			drawLines(pantalla, n->left);
-		}
-		if (n->right) {
-			drawLine(pantalla, n, n->right);
-			drawLines(pantalla, n->right);
-		}
-	}
+        return false;
+    }
 
-	// ************************* EJERCICIO *********************************
-
-	void crear_arbol(int v) {
-		clear(root);
-		root = new node(v);
-		vueltas = 0;
-		terminado = false;
-	}
-
-	void insertar_nodo(std::string rut, int k) {
-		node** p = &root;
-		for (char c : rut) {
-			if ((!*p))
-				return;
-			if (c == 'L')
-				p = &(*p)->left;
-			else if (c == 'R')
-				p = &(*p)->right;
-			else
-				continue;
-		}
-		(*p) = new node(k);
-	}
-
-	bool recorrido(node* p, int max_cambio) {
-		if (!p)
-			return false;
-
-		bool cambio = false;
-
-		if (p->left && p->marca != max_cambio && p->left->marca != max_cambio) {
-			node* h = p->left;
-			if (h->value > 1 && h->value >= p->value) {
-				h->value--;
-				p->value++;
-				cambio = true;
-			}
-			else if (h->value == 0 && p->value >= 1) {
-				h->value++;
-				p->value--;
-				cambio = true;
-			}
-			if (cambio)
-				p->marca = h->marca = max_cambio;
-		}
-
-		if (p->right && p->marca != max_cambio && p->right->marca != max_cambio) {
-			node* h = p->right;
-			if (h->value > 1 && h->value >= p->value) {
-				h->value--;
-				p->value++;
-				cambio = true;
-			}
-			else if (h->value == 0 && p->value >= 1) {
-				h->value++;
-				p->value--;
-				cambio = true;
-			}
-			if (cambio)
-				p->marca = h->marca = max_cambio;
-		}
-
-		bool a = recorrido(p->left, max_cambio);
-		bool b = recorrido(p->right, max_cambio);
-
-		return cambio || a || b;
-	}
-
-	// Un solo paso = una ronda de recorrido
-	void paso() {
-		if (terminado)
-			return;
-		if (recorrido(root, vueltas + 1))
-			vueltas++;
-		else
-			terminado = true;
-	}
-
-	int get_vueltas() { return vueltas; }
-	bool get_terminado() { return terminado; }
-
-	void draw() {
-		sf::Font font;
-		if (!font.loadFromFile("C:/Windows/Fonts/arial.ttf")) {
-			std::cout << "error de fuente" << std::endl;
-			return;
-		}
-
-		int col = 1;
-		setPosxy(root, 0, col);
-
-		sf::RenderWindow pantalla(sf::VideoMode(1200, 800), "Armar_suma");
-		pantalla.setFramerateLimit(60);
-
-		bool automatico = false;
-		sf::Clock reloj;
-
-		while (pantalla.isOpen()) {
-			sf::Event ev;
-			while (pantalla.pollEvent(ev)) {
-				if (ev.type == sf::Event::Closed)
-					pantalla.close();
-
-				if (ev.type == sf::Event::KeyPressed) {
-					if (ev.key.code == sf::Keyboard::Space)
-						paso();
-					else if (ev.key.code == sf::Keyboard::A) {
-						automatico = !automatico;
-						reloj.restart();
-					}
-					else if (ev.key.code == sf::Keyboard::R) {
-						crear_arbol(3);
-						insertar_nodo("L", 0);
-						insertar_nodo("R", 0);
-						insertar_nodo("RL", 2);
-						insertar_nodo("RR", 0);
-						col = 1;
-						setPosxy(root, 0, col);
-					}
-				}
-			}
-
-			if (automatico && reloj.getElapsedTime().asSeconds() >= 1.0f) {
-				paso();
-				reloj.restart();
-			}
-
-			pantalla.clear(sf::Color(30, 30, 30));
-			drawLines(pantalla, root);
-			drawNodes(pantalla, root, font);
-
-			std::string msg = "Paso: " + std::to_string(vueltas);
-			if (terminado)
-				msg += "  (terminado)";
-			msg += "   |   ESPACIO: paso   A: auto (" + std::string(automatico ? "ON" : "OFF") + ")   R: reiniciar";
-
-			sf::Text info(msg, font, 20);
-			info.setFillColor(sf::Color::White);
-			info.setPosition(10.f, 10.f);
-			pantalla.draw(info);
-
-			pantalla.display();
-		}
-	}
+    void paso() {
+        if (terminado) return;
+        if (recorrido(root, vueltas + 1))
+            vueltas++;
+        else
+            terminado = true;
+    }
 };
 
+// -------------------------------------------------------------
+// FUNCIONES DE DIBUJO
+// -------------------------------------------------------------
+void drawTreeEdges(sf::RenderWindow& window, Node* root) {
+    if (!root) return;
+    if (root->left) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(root->x, root->y), sf::Color::White),
+            sf::Vertex(sf::Vector2f(root->left->x, root->left->y), sf::Color::White)
+        };
+        window.draw(line, 2, sf::Lines);
+        drawTreeEdges(window, root->left);
+    }
+    if (root->right) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(root->x, root->y), sf::Color::White),
+            sf::Vertex(sf::Vector2f(root->right->x, root->right->y), sf::Color::White)
+        };
+        window.draw(line, 2, sf::Lines);
+        drawTreeEdges(window, root->right);
+    }
+}
+
+void drawTreeNodes(sf::RenderWindow& window, Node* root, sf::Font& font, int vueltas, bool terminado) {
+    if (!root) return;
+
+    float radius = 18.0f;
+    sf::CircleShape circle(radius);
+    circle.setOrigin(radius, radius);
+    circle.setPosition(root->x, root->y);
+
+    bool cambio = (!terminado && vueltas > 0 && root->marca == vueltas);
+    circle.setFillColor(cambio ? sf::Color::Green : sf::Color::White);
+
+    window.draw(circle);
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString(to_string(root->v));
+    text.setCharacterSize(16);
+    text.setFillColor(sf::Color::Black);
+
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setOrigin(textRect.left + textRect.width / 2.0f,
+        textRect.top + textRect.height / 2.0f);
+    text.setPosition(root->x, root->y);
+
+    window.draw(text);
+
+    drawTreeNodes(window, root->left, font, vueltas, terminado);
+    drawTreeNodes(window, root->right, font, vueltas, terminado);
+}
+
+// -------------------------------------------------------------
+// MAIN
+// -------------------------------------------------------------
 int main() {
-	Ctree c1;
+    sf::RenderWindow window(sf::VideoMode(1200, 800), "Arbol de Caramelos");
+    window.setFramerateLimit(60);
 
-	// Arbol:      3
-	//           /   \
-	//          0     0
-	//               / \
-	//              2   0
-	c1.crear_arbol(3);
-	c1.insertar_nodo("L", 0);
-	c1.insertar_nodo("R", 0);
-	c1.insertar_nodo("RL", 2);
-	c1.insertar_nodo("RR", 0);
+    sf::Font font;
+    if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
+        cout << "Error cargando fuente" << endl;
+    }
 
-	c1.draw();
+    CandyTree tree;
+    tree.crear_arbol(3);
+    tree.insertar_nodo("L", 0);
+    tree.insertar_nodo("R", 0);
+    tree.insertar_nodo("RL", 2);
+    tree.insertar_nodo("RR", 0);
 
-	return 0;
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Space) {
+                    tree.paso();
+                }
+            }
+        }
+
+        if (tree.get_root()) {
+            tree.calculatePositions(tree.get_root(), 600.0f, 100.0f, 250.0f);
+        }
+
+        window.clear(sf::Color(30, 30, 30));
+
+        drawTreeEdges(window, tree.get_root());
+        drawTreeNodes(window, tree.get_root(), font, tree.get_vueltas(), tree.get_terminado());
+
+        // Texto informativo simplificado
+        string msg = "Paso: " + to_string(tree.get_vueltas());
+        if (tree.get_terminado()) msg += " (Terminado)";
+        msg += "  |  ESPACIO: Avanzar paso";
+
+        sf::Text info(msg, font, 18);
+        info.setFillColor(sf::Color::White);
+        info.setPosition(15.0f, 15.0f);
+        window.draw(info);
+
+        window.display();
+    }
+
+    return 0;
 }
