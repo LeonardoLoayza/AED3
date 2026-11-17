@@ -65,6 +65,25 @@ bool CMatrix<T,NE>::findy(int x,int y,T value, Node<T>**&q){
 }
 
 
+//void ins(int x, int y,T value);
+template<class T, T NE>
+void CMatrix<T, NE>::ins(int x,int y, T value){
+    Node<T>**p=nullptr; 
+    Node<T>**q=nullptr; 
+    bool x_vector= *(ejeX+x); 
+    bool y_vector= *(ejeY+y); 
+    
+    if( dimx>x || dimy>y ) return ; 
+    
+    x_vector=findx(x,y,value,p); 
+    if (x_vector){ // Existe, asi que solo cambio el valor 
+        // comprobar que funciona esto
+        (*p)->val = value;
+        return; 
+    }
+}
+
+
 
 int main()
 {
