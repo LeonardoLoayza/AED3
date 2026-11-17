@@ -12,6 +12,9 @@ public:
         y=_y; 
         val=_val; 
     }
+    T getY(){
+        return y;
+    }
 };
 
 template <class T, T NE> 
@@ -46,11 +49,22 @@ template<class T, T NE>
 bool CMatrix<T, NE>::findx(int x,int y,T value, Node<T>**&p){
     if( *(ejeX+x) != nullptr){
         p= ( ejeX+x );
-        while();
-        
+        for(;*p && (*p)->getY() == y; p =&((*p)->abajo) );
     }
-    return true ;
+    return *p && (*p) && (*p)->getY == y; 
 }
+
+template<class T, T NE>
+bool CMatrix<T,NE>::findy(int x,int y,T value, Node<T>**&q){
+    if ( *(ejeY+y)  != nullptr ){
+        q=ejeY+y; 
+        for(; *q && (*q)->x == x ; q=&((*q)->derecha) ); 
+    }
+    
+    return *q && (*q) && (*q)->x == x; 
+}
+
+
 
 int main()
 {
