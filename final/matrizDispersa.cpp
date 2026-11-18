@@ -74,10 +74,20 @@ void CMatrix<T, NE>::ins(int x, int y, T value) {
 
     if (dimx > x || dimy > y) return;
 
-    x_vector = findx(x, y, value, p);
-    //Existe el 
-    if (x_vector) {
+    bool f_x = findx(x, y, value, p);
+    bool f_x = findy(x, y, value, q);
+    
+    //Existe el nodo x,y 
+    if (f_x) {
+        (*p)->val=value;
+        return; 
+    }
 
+    //En caso no existe
+    Node<T>* tmp = new Node<T>(x, y, value);
+
+    if (!x_vector) {
+        
     }
 }
 
