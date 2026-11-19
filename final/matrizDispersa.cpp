@@ -152,12 +152,14 @@ T CMatrix<T,NE>::get(int x,int y){
     if (x < 0 || y < 0 || x >= dimx || y >= dimy) return NE;
     
     Node<T>**p=nullptr; 
-    bool existe = findx(x,y,value,p); 
     
-    if(existe)
+    // no entiendo estooo ooo oo
+    if(findx(x,y,NE,p)){
         return (*p)->val; 
-    else 
-        return NE; 
+    }
+    
+    return NE; 
+    
 }
 
 template<class T, T NE> 
@@ -167,6 +169,16 @@ void CMatrix<T,NE>::set(int x, int y, T value){
 
 // hacer print 
 // hacer destructor 
+
+template<class T, T NE> 
+void CMatrix<T,NE>::print(){
+    for(int y=0;y<dimy;++y){
+        for(int x=0;x<dimx;++x){
+            std::cout << get(x,y) << " "; 
+        }
+        std::cout<<"\n";
+    }
+}
 
 
 int main()
