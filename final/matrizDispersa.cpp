@@ -33,7 +33,19 @@ public:
     }
     
     ~CMatrix(){
-        
+        for(int i=0; i<dimx;++i){
+            Node<T>* actual = ejeX[i];
+            
+            while(actual!=nullptr){
+                Node<T>*d=actual; 
+                actual=actual->abajo; 
+                delete d;
+            }
+        }
+        delete[] ejeX; 
+        delete[] ejeY; 
+        ejeX=nullptr; 
+        ejeY=nullptr; 
     }    
 
 
