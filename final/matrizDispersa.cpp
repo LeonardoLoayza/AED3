@@ -31,6 +31,11 @@ public:
         for (int i = 0;i < dimy;++i)
             ejeY[i] = nullptr;
     }
+    
+    ~CMatrix(){
+        
+    }    
+
 
     bool findx(int x, int y, T value, Node<T>**& p);
     bool findy(int x, int y, T value, Node<T>**& q);
@@ -128,6 +133,28 @@ void CMatrix<T,NE>::rem(int x, int y, T value){
     delete d; 
     return;     
 }
+
+template<class T, T NE> 
+T CMatrix<T,NE>::get(int x,int y){
+    // check boundaries 
+    if (x < 0 || y < 0 || x >= dimx || y >= dimy) return NE;
+    
+    Node<T>**p=nullptr; 
+    bool existe = findx(x,y,value,p); 
+    
+    if(existe)
+        return (*p)->val; 
+    else 
+        return NE; 
+}
+
+template<class T, T NE> 
+void CMatrix<T,NE>::set(int x, int y, T value){
+    ins(x,y,value); 
+}
+
+// hacer print 
+// hacer destructor 
 
 
 int main()
