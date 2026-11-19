@@ -91,7 +91,7 @@ void CMatrix<T, NE>::ins(int x, int y, T value) {
     findy(x,y,value,q); 
     
     // Crea nodo y reconecta 
-    Node<T> * tmp = new Node(x,y,value); 
+    Node<T> * tmp = new Node<T>(x,y,value); 
     
     tmp->abajo=*p;
     *p=tmp; 
@@ -100,6 +100,33 @@ void CMatrix<T, NE>::ins(int x, int y, T value) {
     *q=tmp;
     
     return ;
+}
+
+template <class T, T NE>
+void CMatrix<T,NE>::rem(int x, int y, T value){
+    // boudnaries
+    if(x<0 || y<0 || x>=dimx || y>=dimy) 
+        return; 
+        
+    Node<T>**p=nullptr; 
+    Node<T>**q=nullptr; 
+    
+    bool existe = findx(x,y,value, p); 
+    
+    // no existe 
+    if(!existe) 
+        return; 
+    
+    // borra y reconecta, y limpia memoria 
+    findy(x,y,value,q); 
+    
+    Node<T>*d=*p; 
+    
+    *p = d->abajo; 
+    *q = d->derecha; 
+    
+    delete d; 
+    return;     
 }
 
 
