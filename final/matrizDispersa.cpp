@@ -10,6 +10,8 @@ public:
         x = _x;
         y = _y;
         val = _val;
+        abajo=nullptr; 
+        derecha=nullptr; 
     }
     T getY() {
         return y;
@@ -46,51 +48,59 @@ private:
 };
 template<class T, T NE>
 bool CMatrix<T, NE>::findx(int x, int y, T value, Node<T>**& p) {
-    if (*(ejeX + x) != nullptr) {
-        p = (ejeX + x);
-        for (;*p && (*p)->getY() < y; p = &((*p)->abajo));
-    }
-    return *p && (*p) && (*p)->getY == y;
+    p = (ejeX + x);
+    for (;*p && (*p)->getY() < y; p = &((*p)->abajo));
+    
+    return *p && (*p)->getY() == y;
 }
 
 template<class T, T NE>
 bool CMatrix<T, NE>::findy(int x, int y, T value, Node<T>**& q) {
-    if (*(ejeY + y) != nullptr) {
-        q = ejeY + y;
-        for (; *q && (*q)->x < x; q = &((*q)->derecha));
-    }
+    q = ejeY + y;
+    for (; *q && (*q)->x < x; q = &((*q)->derecha));
 
-    return *q && (*q) && (*q)->x == x;
+    return *q && (*q)->x == x;
 }
-
 
 //void ins(int x, int y,T value);
 template<class T, T NE>
 void CMatrix<T, NE>::ins(int x, int y, T value) {
-    Node<T>** p = nullptr;
-    Node<T>** q = nullptr;
-    bool x_vector = *(ejeX + x);
-    bool y_vector = *(ejeY + y);
-
-    if (dimx > x || dimy > y) return;
-
-    bool f_x = findx(x, y, value, p);
-    bool f_x = findy(x, y, value, q);
+    // check boundaries 
+    if(x<0 || y<0 || x>=dimx || y>=dimy) return; 
     
-    //Existe el nodo x,y 
-    if (f_x) {
+    Node<T>**p=nullptr;
+    Node<T>**q=nullptr; 
+    
+    bool existe = findx(x,y,value,p); 
+    
+    // Por si pasan un 0, borramos o simplemente retornamos
+    if(value==NE){
+        if(existe){
+            rem(x,y,value);
+        }
+        return; 
+    }
+    
+    // existe el nodo, solo actualiza 
+    if(existe){
         (*p)->val=value;
         return; 
     }
-
-    //En caso no existe
-    Node<T>* tmp = new Node<T>(x, y, value);
-
-    if (!x_vector) {
-        
-    }
+    
+    // posiciona el pointer q
+    findy(x,y,value,q); 
+    
+    // Crea nodo y reconecta 
+    Node<T> * tmp = new Node(x,y,value); 
+    
+    tmp->abajo=*p;
+    *p=tmp; 
+    
+    tmp->derecha=*q; 
+    *q=tmp;
+    
+    return ;
 }
-
 
 
 int main()
