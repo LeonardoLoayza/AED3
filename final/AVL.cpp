@@ -51,9 +51,10 @@ class AVLTree {
 	AVLNode* rotateRight(AVLNode* x) {
 		AVLNode* y = x->left;
 		AVLNode* yr = y->right;
-
+    
+    
+        x->left = yr;
 		y->right = x;
-		x->left = yr;
 
 		updateHeight(x);
 		updateHeight(y);
