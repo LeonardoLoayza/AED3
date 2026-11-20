@@ -23,6 +23,19 @@ public:
 	static const int CAPACITY = 1000; 
 	Node* buckets[CAPACITY]{};
 	int nelem = 0; 
+	
+	~CHash(){
+	    for(int i=0;i<CAPACITY;++i){
+	        Node*current=buckets[i]; 
+	        
+	        while(current!=nullptr){
+	            Node*tmp=current; 
+	            current=current->next; 
+	            delete tmp; 
+	        }
+	    }
+	}
+	
 	int hashFunction(const string& key) {
 		unsigned long hash = 0; 
 
