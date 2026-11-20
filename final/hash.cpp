@@ -44,15 +44,64 @@ public:
 				current->value = value;
 				return;
 			}
-
-
-
+			current=current->next; 
 		}
-
+		
+		
+        Node* nuevo=new Node(key,value); 
+        nuevo->next=buckets[index];
+        buckets[index]=nuevo; 
+    
+        nelem++; 
+		
+        return;
+	}
+	
+	string* search(const string& key) {
+	    int index=hashFunction(key);
+	    
+	    Node * c = buckets[index]; 
+	    
+	    while(c!=nullptr){
+	        if(c->key==key){
+	            return &c->value; 
+	        }
+	        c=c->next; 
+	    }
+	    
+	    return nullptr;
 	}
 
 };
 
-
 int main() {
+    CHash tabla;
+
+    tabla.insert("A101", "Pedro");
+    tabla.insert("B202", "Ana");
+
+    // Prueba 1: Clave existente
+    string* resultado1 = tabla.search("A101");
+    if (resultado1 != nullptr) {
+        cout << "Encontrado: " << *resultado1 << endl; // Imprime: Pedro
+    } else {
+        cout << "No encontrado" << endl;
+    }
+
+    // Prueba 2: Clave inexistente
+    string* resultado2 = tabla.search("Z999");
+    if (resultado2 != nullptr) {
+        cout << "Encontrado: " << *resultado2 << endl;
+    } else {
+        cout << "No encontrado" << endl; // Imprime: No encontrado
+    }
+
+    // Prueba 3: Modificar valor a traves del puntero retornado
+    if (resultado1 != nullptr) {
+        *resultado1 = "Pedro Pablo"; // Modifica directamente el valor en la tabla
+    }
+    
+    cout << "Nuevo valor de A101: " << *tabla.search("A101") << endl; // Imprime: Pedro Pablo
+
+    return 0;
 }
