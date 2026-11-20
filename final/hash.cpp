@@ -33,7 +33,7 @@ public:
 	}
 
 	void insert(const string&key, const string&value) {
-		int index = hashFunction(value); 
+		int index = hashFunction(key); 
 
 		Node* current = buckets[index]; 
 		
@@ -70,6 +70,34 @@ public:
 	    }
 	    
 	    return nullptr;
+	}
+	
+	void deleteKey(const string& key) {
+	    int index=hashFunction(key); 
+	    Node*current=buckets[index]; 
+	    Node*previous=nullptr; 
+	    
+	    while(current!=nullptr){
+	        if(current->key==key){
+	            // if it is the first elem 
+	            if(previous==nullptr){
+	                buckets[index]=current->next; 
+	            }
+	            else {
+	                previous->next=current->next; 
+	            }
+	            
+	            delete current; 
+                nelem--; 
+	            return;
+	        }
+	        
+	        previous=current; 
+	        current=current->next; 
+	    }
+	    
+	    // no se enconro 
+	    return; 
 	}
 
 };
