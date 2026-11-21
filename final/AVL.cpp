@@ -120,13 +120,36 @@ public:
 	}
 
 	bool remv(int x) {
+	    stack<AVLNode**> path; 
+	    AVLNode**p=&root; 
+	    
+	    while (*p && (*p)->v!=x) {
+	        path.push(p); 
+	        if ( (*p)->v > x){
+	            //p=&((*p)->right); 
+	        } else {
+	            //p=&((*p)->left); 
+	        }
+	    }
+	    
+	    // wasnt found, quit 
+	    if (*p == nullptr) return; 
+	    
+	    // 2 children 
+	    if ((*p)->left && (*p)->right){
+	        // find reemp 
+	        // aowfjiw newf
+	    }
+	    
+	    
+	    return false; 
+	    
 	}
 
-	AVLNode** fnd_reemp(AVLNode** p, stack<AVLNode**>& path) {
-	}
+	// AVLNode** fnd_reemp(AVLNode** p, stack<AVLNode**>& path) {}
 
 	bool find(int x, AVLNode**& p) {
-
+        return false; 
 	}
 
 	void print() {
@@ -150,6 +173,7 @@ public:
 	}
 
 	int alturaMax() {
+	    return 1; 
 	}
 
 	void clear(AVLNode* p) {
@@ -158,42 +182,5 @@ public:
 	AVLNode* get_root() { return root; }
 };
 int main() {
-	AVLTree t;
-	cout << "Insertando: 60, 30, 70, 20, 40, 65, 80, 75" << endl;
-	t.insrt(60);
-	t.insrt(30);
-	t.insrt(70);
-	t.insrt(20);
-	t.insrt(40);
-	t.insrt(65);
-	t.insrt(80);
-	t.insrt(75);
-	t.print();
-	t.PrintLevels(); // Verás las alturas y factores de balance
-
-	// Prueba de rotación (insertar 50 causará un desbalance LR en 60)
-	cout << "\nInsertando 50 (causa rotacion LR en 30)" << endl;
-	t.insrt(50);
-	t.print();
-	t.PrintLevels();
-
-	// Prueba de rotación (insertar 10 causará un desbalance LL en 20)
-	cout << "\nInsertando 10 (causa rotacion LL en 20)" << endl;
-	t.insrt(10);
-	t.print();
-	t.PrintLevels();
-
-	cout << "\nEliminando 80 (causa rebalanceo)" << endl;
-	t.remv(80);
-	t.print();
-	t.PrintLevels();
-
-	cout << "\nEliminando 65" << endl;
-	t.remv(65);
-	t.print();
-	t.PrintLevels();
-
-	cout << "\nAltura maxima del arbol: " << t.alturaMax() << endl;
-
-	return 0;
+	AVLTree t; 
 }
