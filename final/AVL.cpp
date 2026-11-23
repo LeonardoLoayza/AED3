@@ -140,15 +140,50 @@ public:
 			
 			// caso 2 hijos, 0 o 1 hijo
 			if ((*p)->left && (*p)->right){
-				
+				AVLNode**q=fnd_reemp(p,path); 
+				(*p)->v=(*q)->v;
+				p=q;
+				lado_reemp=!lado_reemp; 
 			}
 			
+			AVLNode*t=*p; 
 			
-			return false; // cambiar esto 
+			if ((*p)->left){
+				*p=(*p)->left; 
+			} else {
+				*p=(*p)->right; 
+			}
+			delete t; 
 			
+			while(!path.empty()){
+				AVLNode**w=path.top();
+				path.pop();
+				*w=rebalance(*w); 
+			}
+			
+			return true;
 		}
 		
-		AVLNode** fnd_reemp(AVLNode** p, stack<AVLNode**>& path) {}
+		
+		// CHECAR ESTO 
+		AVLNode** fnd_reemp(AVLNode** p, stack<AVLNode**>& path) {
+			AVLNode**q=p; 
+			if(lado_reemp){
+				q=&((*q)->right);
+				while((*q)->left){
+					path.push(q);
+					q=&((*q)->left);
+				}
+			}
+			else {
+				q = &((*q)->left);
+				while ((*q)->right) {
+					path.push(q);
+					q = &((*q)->right);
+				}
+			}
+			return q;
+		}
 		
 		bool find(int x, AVLNode**& p) {
 			return false; 
