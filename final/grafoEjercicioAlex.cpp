@@ -3,6 +3,7 @@
 #include <list>
 #include <cassert>
 #include <queue>
+#include <algorithm>
 using namespace std;
 
 template<typename E>
@@ -66,6 +67,7 @@ private:
 	int numVertices;
 	bool directed;
 	vector<Node<N,E>> nodes;
+	vector<vector<vector<int>>> allPaths; 
 	
 public:
 	Graph(bool dir = false);
@@ -251,16 +253,31 @@ template<typename N, typename E>
 void Graph<N,E>::precalcAllPaths()
 {
 	/* algorithm to compute paths between all pairs of nodes and store them in a precomputed structure */
+	int n=numVertices; 
+	allPaths.clear();
+	allPaths.resize(n); // para que hago esto? 
+	for(int i=0;i<n;i++){
+		allPaths[i].resize(n); // hago resize de cada vector 
+	}
+	
+	for(int i=0;i<n;i++){
+		for(int j=0;j<n;j++){
+			allPaths[i][j]=findPath(i,j);
+		}
+	}
+	
 }
 
 template<typename N, typename E>
 vector<int> Graph<N,E>::findPathFromPreCalc(int from, int to)
 {
-	vector<int> path;
+	validateVertex(from);
+	validateVertex(to);
 	
+	// vector<int> path;
 	/* retrieves the precomputed path between 'from' and 'to' in O(1), assumes precalcAllPaths() was called first */
 	
-	return path;
+	return allPaths[from][to];
 }
 
 template<typename N, typename E>
