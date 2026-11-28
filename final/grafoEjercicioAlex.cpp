@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include <cassert>
+#include <queue>
 using namespace std;
 
 template<typename E>
@@ -182,11 +183,67 @@ template<typename N, typename E>
 vector<int> Graph<N,E>::findPath(int from, int to)
 {
 	validateVertex(from);  validateVertex(to);
-	// vector<int> path;
+	
 	/* algorithm to find a path between 'from' and 'to', traversing the graph */
+	// N - node, E edge 
+	if(from == to ) return {from}; 
+	const E INF = 1e9; 
 	
+	vector<E> dist(numVertices,INF); 
+	vector<int> parent(numVertices,-1); 
+	vector<bool> visited(numVertices,false);
 	
+	// <E,int> distancia acumulada, id del nodo 
+	// que cosas tiene este priority_queue ?
+	// solo distancia acumulada, con id del nodo 
+	priority_queue<pair<E,int> ,
+				   vector<pair<E,int>>, 
+				   greater<pair<E,int> >> pq; 
 	
+	dist[from]=0;
+	pq.push({0,from});
+	
+	while(!pq.empty()){
+		// sacamos el primer elemento 
+		// auto[currentDist, curr]=pq.top(); 
+		pair<E,int> topPair = pq.top(); 
+		pq.pop(); 
+		
+		E currentDist = topPair.first; 
+		int curr = topPair.second;
+		
+		if(visited[curr]) // en caso ya lo visite,zafo, sino lo proceso
+			continue; 
+		
+		// proceso el indice del nodo curr,
+		// pero si es curr la llegada (to) zafari 
+		visited[curr]=true; 
+		
+		if(curr==to)
+			break; 
+		
+		// visiatare todos los aristas del nodo actual 
+		for(auto&edge : nodes[curr].edges) {
+			int neighbor=edge.to; 
+			E weight = edge.data; // peso de la arista
+			// si la distancia de curr + el peso de mi edge actual 
+			// es menor a la distancia que tengo guardada 
+			// en el vector dist de nieghbor. ENTONCES LA GUARDO 
+			if(!visited[neighbor] && dist[curr] + weight < dist[neighbor] ){
+				dist[neighbor]=dist[curr]+weight; 
+				parent[neighbor]=curr; 
+				pq.push({dist[neighbor],neighbor}); // distancia del nodo, nodo
+			}
+		}
+	}
+	vector<int>path; 
+	if(dist[to]==INF) // no encontramos ni pincho
+		return path; 
+	
+	for(int i=to;i!=-1;i=parent[i]){
+		path.push_back(i); 
+	}
+	reverse(path.begin(),path.end());
 	return path;
 }
 
